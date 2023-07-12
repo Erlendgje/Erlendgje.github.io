@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Snake Game</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+    }
+    #game-board {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: black;
+    }
+    #score {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      color: white;
+      font-size: 24px;
+    }
+    #top-players {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: white;
+      font-size: 24px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div id="game-board"></div>
+  <div id="score">Score: 0</div>
+  <div id="top-players"></div>
+
+  <script>
+    var ogMessages = [
+      "AmaZIIIIIng!",
+      "craZI!!!",
+      "ZIck!!!!!",
+      "Your ZImply the best!!!",
+      "BaZIIIInga!!!",
+      "Ziriously?!"
+    ];
+
+    var messages = [...ogMessages];
+
+    var messageDisplayed = false;
+
+    // Snake game logic
+    var snake = [{ x: 0, y: 0 }];
+    var snakeGifs = ["taxzi_excited.gif"];
+    var direction = "right";
+    var lastDirection = "right";
+    var gameBoardWidth = window.innerWidth;
+    var gameBoardHeight = window.innerHeight;
+    var segmentSize = 50;
+    var score = 0;
+    var scoreElement = document.getElementById("score");
+    var food = getRandomFood();
+    var started = false;
+
+    function getRandomFood() {
+      var foodGifs = [
+        "pirat_taxzi_drive.gif",
+        "taxzi_deal-with-it.gif",
+        "taxzi_drive.gif",
+        "taxzi_excited.gif",
+        "taxzi_fire.gif",
+        "taxzi_gun.gif",
+        "taxzi_shake.gif",
+        "taxzi_spin.gif",
+        "taxzi_zoom_love.gif"
+        // Add more food GIFs here
+      ];
+      var randomIndex = Math.floor(Math.random() * foodGifs.length);
+      var maxPosX = Math.floor(gameBoardWidth / segmentSize) * segmentSize - segmentSize;
+      var maxPosY = Math.floor(gameBoardHeight / segmentSize) * segmentSize - segmentSize;
+
+      // Generate random coordinates until a valid position is found
+      var x, y;
+      do {
+        x = Math.floor(Math.random() * (maxPosX / segmentSize + 1)) * segmentSize;
+        y = Math.floor(Math.random() * (maxPosY / segmentSize + 1)) * segmentSize;
+      } while (isSnakeOverlap(x, y));
+
+      return { x: x, y: y, src: foodGifs[randomIndex] };
+    }
+
+    function isSnakeOverlap(x, y) {
+      for (var i = 0; i < snake.length; i++) {
+        if (snake[i].x === x && snake[i].y === y) {
+          return true;
+        }
+      }
+      return false;
+    }
+
+    function draw() {
+      var gameBoard = document.getElementById("game-board");
+      gameBoard.innerHTML = "";
+
+      // Draw the snake
+      snake.forEach(function (segment, index) {
+        var snakeSegment = document.createElement("img");
+        snakeSegment.src = snakeGifs[index];
+        snakeSegment.style.position = "absolute";
+        snakeSegment.style.left = segment.x + "px";
+        snakeSegment.style.top = segment.y + "px";
+        snakeSegment.style.width = segmentSize + "px";
+        snakeSegment.style.height = segmentSize + "px";
+        gameBoard.appendChild(snakeSegment);
+      });
+
+      // Draw the food
+      var foodImage = document.createElement("img");
+      foodImage.src = food.src;
+      foodImage.style.position = "absolute";
+      foodImage.style.left = food.x + "px";
+      foodImage.style.top = food.y + "px";
+      foodImage.style.width = segmentSize + "px";
+      foodImage.style.height = segmentSize + "px";
+      gameBoard.appendChild(foodImage);
+    }
+
+    function update() {
+      lastDirection = direction; // Update the last direction
+      var head = Object.assign({}, snake[0]);
+
+      if (!started) {
+        setTimeout(update, 100);
+        return;
+      }
+
+      // Update the head position based on the current direction
+      if (direction === "right") {
+        head.x += segmentSize;
+      } else if (direction === "left") {
+        head.x -= segmentSize;
+      } else if (direction === "up") {
+        head.y -= segmentSize;
+      } else if (direction === "down") {
+        head.y += segmentSize;
+      }
+
+      // Check for collision with boundaries
+      if (
+        head.x < 0 ||
+        head.x >= gameBoardWidth ||
+        head.y < 0 ||
+        head.y >= gameBoardHeight
+      ) {
+        gameOver();
+        return;
+      }
+
+      // Check for collision with the snake's body
+      for (var j = 1; j < snake.length; j++) {
+        if (head.x === snake[j].x && head.y === snake[j].y) {
+          gameOver();
+          return;
+        }
+      }
+
+      // Check if the snake eats the food
+      var foodEaten = head.x === food.x && head.y === food.y;
+
+      // Update the snake's body
+      snake.unshift({ x: head.x, y: head.y });
+      if (!foodEaten) {
+        snake.pop();
+      } else {
+        snakeGifs.push(food.src);
+        food = getRandomFood();
+        score += 1;
+        scoreElement.textContent = "Score: " + score;
+        if (score == 10) {
+          // Display the message 'CRAZI' for 2 seconds
+          var crazinessElement = document.createElement("div");
+          crazinessElement.textContent = "That was eaZI!";
+          crazinessElement.style.position = "absolute";
+          crazinessElement.style.top = "50%";
+          crazinessElement.style.left = "50%";
+          crazinessElement.style.transform = "translate(-50%, -50%)";
+          crazinessElement.style.color = "white";
+          crazinessElement.style.fontSize = "48px";
+          document.body.appendChild(crazinessElement);
+
+          setTimeout(function () {
+            document.body.removeChild(crazinessElement);
+          }, 2000);
+        }
+
+        if (score % 50 === 0) {
+          // Display a random message for 2 seconds
+          var crazinessElement = document.createElement("div");
+          var index = Math.floor(Math.random() * messages.length);
+          crazinessElement.textContent = messages[index];
+          messages.splice(index, 1);
+          if (messages.length === 0) {
+            messages = [...ogMessages];
+          }
+          crazinessElement.style.position = "absolute";
+          crazinessElement.style.top = "50%";
+          crazinessElement.style.left = "50%";
+          crazinessElement.style.transform = "translate(-50%, -50%)";
+          crazinessElement.style.color = "white";
+          crazinessElement.style.fontSize = "48px";
+          document.body.appendChild(crazinessElement);
+
+          setTimeout(function () {
+            document.body.removeChild(crazinessElement);
+          }, 2000);
+        }
+      }
+
+      draw();
+      setTimeout(update, 100);
+    }
+
+    function gameOver() {
+      var name = prompt('Game Over! Enter your name:');
+      if (name) {
+        sendScore(name, score);
+      }
+      setTimeout(function() {
+        displayTopPlayers();
+      }, 1000);
+      snake = [{ x: 0, y: 0 }];
+      snakeGifs = ["taxzi_excited.gif"];
+      direction = "right";
+      food = getRandomFood();
+      score = 0;
+      scoreElement.textContent = "Score: " + score;
+      draw();
+      started = false;
+      setTimeout(update, 100);
+    }
+
+    function displayTopPlayers() {
+      var topPlayersElement = document.getElementById("top-players");
+      topPlayersElement.innerHTML = "Top Players:<br>";
+
+      fetch('https://sheetdb.io/api/v1/5kgtfv38c6ss1?sort_by=score&sort_order=desc&limit=10&cast_numbers=score')
+        .then((response) => response.json())
+        .then((data) => {
+          data.forEach(function (player, index) {
+            var playerElement = document.createElement("div");
+            playerElement.textContent = (index + 1) + ". " + player.name + " - " + player.score;
+            topPlayersElement.appendChild(playerElement);
+          });
+        });
+    }
+
+// Event listeners for keyboard controls
+document.addEventListener("keydown", function (event) {
+  if (event.key === "ArrowRight" && lastDirection !== "left") { // Check the last direction instead of the current direction
+    started = true;
+    var topPlayersElement = document.getElementById("top-players");
+    topPlayersElement.innerHTML = "";
+    direction = "right";
+  } else if (event.key === "ArrowLeft" && lastDirection !== "right") { // Check the last direction instead of the current direction
+    started = true;
+    var topPlayersElement = document.getElementById("top-players");
+    topPlayersElement.innerHTML = "";
+    direction = "left";
+  } else if (event.key === "ArrowUp" && lastDirection !== "down") { // Check the last direction instead of the current direction
+    var topPlayersElement = document.getElementById("top-players");
+    topPlayersElement.innerHTML = "";
+    started = true;
+    direction = "up";
+  } else if (event.key === "ArrowDown" && lastDirection !== "up") { // Check the last direction instead of the current direction
+    var topPlayersElement = document.getElementById("top-players");
+    topPlayersElement.innerHTML = "";
+    started = true;
+    direction = "down";
+  }
+});
+
+    function handleResize() {
+      gameBoardWidth = window.innerWidth;
+      gameBoardHeight = window.innerHeight;
+    }
+
+    // Event listener for window resize
+    window.addEventListener("resize", handleResize);
+
+    function sendScore(name, score) {
+      fetch('https://sheetdb.io/api/v1/5kgtfv38c6ss1', {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          data: [
+            {
+              'name': name,
+              'score': score
+            }
+          ]
+        })
+      }).then((response) => response.json())
+        .then((data) => console.log(data));
+    }
+
+    draw();
+    update();
+  </script>
+</body>
+</html>

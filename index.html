@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Taxzi</title>
+    <link rel="icon" href="taxzi_disgusted.png" type="image/png" />
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+        img {
+            width: 100%;
+            height: 100%;
+            object-fit: fill;
+        }
+    </style>
+</head>
+<body id="body">
+  <script>
+    // Array of GIF URLs
+    var gifs = [
+      "pirat_taxzi_drive.gif",
+      "taxzi_deal-with-it.gif",
+      "taxzi_drive.gif",
+      "taxzi_excited.gif",
+      "taxzi_fire.gif",
+      "taxzi_gun.gif",
+      "taxzi_shake.gif",
+      "taxzi_spin.gif",
+      "taxzi_zoom_love.gif"
+      // Add more GIF URLs here
+    ];
+
+    // Get a random GIF URL from the array
+    var randomGif = gifs[Math.floor(Math.random() * gifs.length)];
+
+    // Create an image element
+    var img = document.createElement("img");
+    img.src = randomGif;
+
+    // Add the image to the container div
+    var container = document.getElementById("body");
+    container.appendChild(img);
+  </script>
+</body>
+</html>

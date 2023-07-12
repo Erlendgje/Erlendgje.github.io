@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Pacman Game</title>
+  <style>
+    #game-board {
+      width: 400px;
+      height: 400px;
+      background-color: black;
+      position: relative;
+    }
+
+    .pacman {
+      width: 50px;
+      height: 50px;
+      background-color: yellow;
+      border-radius: 50%;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+  </style>
+</head>
+
+<body>
+  <div id="game-board">
+    <div class="pacman"></div>
+  </div>
+
+  <script>
+    document.addEventListener('keydown', function(event) {
+      const pacman = document.querySelector('.pacman');
+      const key = event.key;
+
+      if (key === 'ArrowUp') {
+        pacman.style.top = parseFloat(pacman.style.top) - 10 + 'px';
+      } else if (key === 'ArrowDown') {
+        pacman.style.top = parseFloat(pacman.style.top) + 10 + 'px';
+      } else if (key === 'ArrowLeft') {
+        pacman.style.left = parseFloat(pacman.style.left) - 10 + 'px';
+      } else if (key === 'ArrowRight') {
+        pacman.style.left = parseFloat(pacman.style.left) + 10 + 'px';
+      }
+    });
+  </script>
+</body>
+</html>
