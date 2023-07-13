@@ -231,10 +231,9 @@
       var name = prompt('Game Over! Enter your name:');
       if (name) {
         sendScore(name, score);
-      }
-      setTimeout(function() {
+      } else {
         displayTopPlayers();
-      }, 1000);
+      }
       snake = [{ x: 0, y: 0 }];
       snakeGifs = ["taxzi_excited.gif"];
       direction = "right";
@@ -255,9 +254,12 @@
         .then((data) => {
           data.forEach(function (player, index) {
             var playerElement = document.createElement("div");
-            playerElement.textContent = (index + 1) + ". " + player.name + " - " + player.score;
+            playerElement.textContent = (index + 1) + ". " + player.name + " : " + player.score;
             topPlayersElement.appendChild(playerElement);
           });
+          var playerElement = document.createElement("div");
+            playerElement.textContent = "11. Tormod : -198";
+            topPlayersElement.appendChild(playerElement);
         });
     }
 
@@ -309,7 +311,7 @@ document.addEventListener("keydown", function (event) {
             }
           ]
         })
-      }).then((response) => response.json())
+      }).then((response) => displayTopPlayers())
         .then((data) => console.log(data));
     }
 
