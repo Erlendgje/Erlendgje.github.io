@@ -55,6 +55,7 @@
     var messages = [...ogMessages];
 
     var messageDisplayed = false;
+    var sevenZisDisplayed = false;
 
     // Snake game logic
     var snake = [{ x: 0, y: 0 }];
@@ -133,6 +134,25 @@
     }
 
     function update() {
+
+      if (new Set(snakeGifs.slice(1)).size == 7 && !sevenZisDisplayed) {
+        // Display a random message for 2 seconds
+          sevenZisDisplayed = true;
+          var sevenZis = document.createElement("div");
+          sevenZis.innerHTML = "You have traveled the seven Zis </br> collected 7 different gifs";
+          sevenZis.style.position = "absolute";
+          sevenZis.style.top = "50%";
+          sevenZis.style.left = "50%";
+          sevenZis.style.transform = "translate(-50%, -50%)";
+          sevenZis.style.color = "white";
+          sevenZis.style.fontSize = "48px";
+          document.body.appendChild(sevenZis);
+
+          setTimeout(function () {
+            document.body.removeChild(sevenZis);
+          }, 5000);
+      }
+
       lastDirection = direction; // Update the last direction
       var head = Object.assign({}, snake[0]);
 
@@ -197,7 +217,7 @@
 
           setTimeout(function () {
             document.body.removeChild(crazinessElement);
-          }, 2000);
+          }, 3500);
         }
 
         if (score % 50 === 0) {
@@ -219,7 +239,7 @@
 
           setTimeout(function () {
             document.body.removeChild(crazinessElement);
-          }, 2000);
+          }, 3500);
         }
       }
 

@@ -1,48 +1,134 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Pacman Game</title>
-  <style>
-    #game-board {
-      width: 400px;
-      height: 400px;
-      background-color: black;
-      position: relative;
-    }
-
-    .pacman {
-      width: 50px;
-      height: 50px;
-      background-color: yellow;
-      border-radius: 50%;
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-    }
-  </style>
+    <title>Game Board</title>
+    <style>
+        canvas {
+            border: 1px solid black;
+        }
+    </style>
 </head>
-
 <body>
-  <div id="game-board">
-    <div class="pacman"></div>
-  </div>
+    <canvas id="gameCanvas"></canvas>
 
-  <script>
-    document.addEventListener('keydown', function(event) {
-      const pacman = document.querySelector('.pacman');
-      const key = event.key;
+    <script>
+        // Define the game board as a 2D array
+        var gameBoard = [
+[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+[1,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,1],
+[1,0,1,1,1,1,0,1,1,1,1,1,0,1,1,0,1,1,1,1,1,0,1,1,1,1,0,1],
+[1,0,1,1,1,1,0,1,1,1,1,1,0,1,1,0,1,1,1,1,1,0,1,1,1,1,0,1],
+[1,0,1,1,1,1,0,1,1,1,1,1,0,1,1,0,1,1,1,1,1,0,1,1,1,1,0,1],
+[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+[1,0,1,1,1,1,0,1,1,0,1,1,1,1,1,1,1,1,0,1,1,0,1,1,1,1,0,1],
+[1,0,1,1,1,1,0,1,1,0,1,1,1,1,1,1,1,1,0,1,1,0,1,1,1,1,0,1],
+[1,0,0,0,0,0,0,1,1,0,0,0,0,1,1,0,0,0,0,1,1,0,0,0,0,0,0,1],
+[1,1,1,1,1,1,0,1,1,1,1,1,0,1,1,0,1,1,1,1,1,0,1,1,1,1,1,1],
+[0,0,0,0,0,1,0,1,1,1,1,1,0,1,1,0,1,1,1,1,1,0,1,0,0,0,0,0],
+[0,0,0,0,0,1,0,1,1,0,0,0,0,0,0,0,0,0,0,1,1,0,1,0,0,0,0,0],
+[0,0,0,0,0,1,0,1,1,0,1,1,1,1,1,1,1,1,0,1,1,0,1,0,0,0,0,0],
+[1,1,1,1,1,1,0,1,1,0,1,0,0,0,0,0,0,1,0,1,1,0,1,1,1,1,1,1],
+[0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0],
+[1,1,1,1,1,1,0,1,1,0,1,0,0,0,0,0,0,1,0,1,1,0,1,1,1,1,1,1],
+[0,0,0,0,0,1,0,1,1,0,1,1,1,1,1,1,1,1,0,1,1,0,1,0,0,0,0,0],
+[0,0,0,0,0,1,0,1,1,0,0,0,0,0,0,0,0,0,0,1,1,0,1,0,0,0,0,0],
+[0,0,0,0,0,1,0,1,1,0,1,1,1,1,1,1,1,1,0,1,1,0,1,0,0,0,0,0],
+[1,1,1,1,1,1,0,1,1,0,1,1,1,1,1,1,1,1,0,1,1,0,1,1,1,1,1,1],
+[1,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,1],
+[1,0,1,1,1,1,0,1,1,1,1,1,0,1,1,0,1,1,1,1,1,0,1,1,1,1,0,1],
+[1,0,1,1,1,1,0,1,1,1,1,1,0,1,1,0,1,1,1,1,1,0,1,1,1,1,0,1],
+[1,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,1],
+[1,0,0,0,1,1,0,1,1,0,1,1,1,1,1,1,1,1,0,1,1,0,1,1,0,1,1,1],
+[1,0,0,0,1,1,0,1,1,0,1,1,1,1,1,1,1,1,0,1,1,0,1,1,0,1,1,1],
+[1,0,0,0,0,0,0,1,1,0,0,0,0,1,1,0,0,0,0,1,1,0,0,0,0,0,0,1],
+[1,0,1,1,1,1,1,1,1,1,1,1,0,1,1,0,1,1,1,1,1,1,1,1,1,1,0,1],
+[1,0,1,1,1,1,1,1,1,1,1,1,0,1,1,0,1,1,1,1,1,1,1,1,1,1,0,1],
+[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
+];
 
-      if (key === 'ArrowUp') {
-        pacman.style.top = parseFloat(pacman.style.top) - 10 + 'px';
-      } else if (key === 'ArrowDown') {
-        pacman.style.top = parseFloat(pacman.style.top) + 10 + 'px';
-      } else if (key === 'ArrowLeft') {
-        pacman.style.left = parseFloat(pacman.style.left) - 10 + 'px';
-      } else if (key === 'ArrowRight') {
-        pacman.style.left = parseFloat(pacman.style.left) + 10 + 'px';
-      }
-    });
-  </script>
+        // Set up the canvas
+        var canvas = document.getElementById('gameCanvas');
+        var context = canvas.getContext('2d');
+        var tileSize = 20; // Size of each tile in pixels
+
+        // Set the canvas size based on the game board dimensions
+        canvas.width = gameBoard[0].length * tileSize;
+        canvas.height = gameBoard.length * tileSize;
+
+function isWallTile(row, col) {
+    return gameBoard[row][col] === 1;
+}
+
+
+        // Draw the game board
+// Modify the drawing logic
+for (var row = 0; row < gameBoard.length; row++) {
+    for (var col = 0; col < gameBoard[row].length; col++) {
+        var tileX = col * tileSize;
+        var tileY = row * tileSize;
+        
+        // Check if the current tile is a wall tile
+        if (isWallTile(row, col)) {
+            // Check the neighboring tiles
+            var topTile = row > 0 ? isWallTile(row - 1, col) : false;
+            var rightTile = col < gameBoard[row].length - 1 ? isWallTile(row, col + 1) : false;
+            var bottomTile = row < gameBoard.length - 1 ? isWallTile(row + 1, col) : false;
+            var leftTile = col > 0 ? isWallTile(row, col - 1) : false;
+
+            // Determine the corner type for each corner of the wall tile
+            var topLeftCorner = !topTile && !leftTile;
+            var topRightCorner = !topTile && !rightTile;
+            var bottomLeftCorner = !bottomTile && !leftTile;
+            var bottomRightCorner = !bottomTile && !rightTile;
+
+            // Update the drawing based on the corner type
+            if (topLeftCorner) {
+                // Draw top left rounded corner
+                context.beginPath();
+                context.arc(tileX + tileSize/2, tileY + tileSize/2, tileSize/2, Math.PI, 1.5 * Math.PI);
+                context.lineTo(tileX + tileSize, tileY);
+                context.fillStyle = 'black';
+                context.fill();
+                context.closePath();
+            } else if (topRightCorner) {
+                // Draw top right rounded corner
+                context.beginPath();
+                context.arc(tileX + tileSize/2, tileY + tileSize/2, tileSize/2, 1.5 * Math.PI, 2 * Math.PI);
+                context.lineTo(tileX, tileY);
+                context.fillStyle = 'black';
+                context.fill();
+                context.closePath();
+            } else if (bottomLeftCorner) {
+                // Draw bottom left rounded corner
+                context.beginPath();
+                context.arc(tileX + tileSize/2, tileY + tileSize/2, tileSize/2, 0.5 * Math.PI, Math.PI);
+                context.lineTo(tileX + tileSize, tileY + tileSize);
+                context.fillStyle = 'black';
+                context.fill();
+                context.closePath();
+            } else if (bottomRightCorner) {
+                // Draw bottom right rounded corner
+                context.beginPath();
+                context.arc(tileX + tileSize/2, tileY + tileSize/2, tileSize/2, 0, 0.5 * Math.PI);
+                context.lineTo(tileX, tileY + tileSize);
+                context.fillStyle = 'black';
+                context.fill();
+                context.closePath();
+            } else {
+                // Draw a regular wall tile
+                context.fillStyle = 'black';
+                context.fillRect(tileX, tileY, tileSize, tileSize);
+            }
+        } else {
+            // Draw an empty tile
+            context.fillStyle = 'white';
+            context.fillRect(tileX, tileY, tileSize, tileSize);
+        }
+    }
+}
+
+
+    </script>
 </body>
 </html>
