@@ -50,7 +50,7 @@
       "Your ZImply the best!!!",
       "BaZIIIInga!!!",
       "Ziriously?!"
-    ];
+      ];
 
     var messages = [...ogMessages];
 
@@ -67,7 +67,7 @@
     var segmentSize = 50;
     var score = 0;
     var scoreElement = document.getElementById("score");
-    var food = getRandomFood();
+    var food = [getRandomFood()];
     var started = false;
 
     function getRandomFood() {
@@ -82,7 +82,7 @@
         "taxzi_spin.gif",
         "taxzi_zoom_love.gif"
         // Add more food GIFs here
-      ];
+        ];
       var randomIndex = Math.floor(Math.random() * foodGifs.length);
       var maxPosX = Math.floor(gameBoardWidth / segmentSize) * segmentSize - segmentSize;
       var maxPosY = Math.floor(gameBoardHeight / segmentSize) * segmentSize - segmentSize;
@@ -123,34 +123,36 @@
       });
 
       // Draw the food
-      var foodImage = document.createElement("img");
-      foodImage.src = food.src;
-      foodImage.style.position = "absolute";
-      foodImage.style.left = food.x + "px";
-      foodImage.style.top = food.y + "px";
-      foodImage.style.width = segmentSize + "px";
-      foodImage.style.height = segmentSize + "px";
-      gameBoard.appendChild(foodImage);
+      food.forEach(function (f) {
+        var foodImage = document.createElement("img");
+        foodImage.src = f.src;
+        foodImage.style.position = "absolute";
+        foodImage.style.left = f.x + "px";
+        foodImage.style.top = f.y + "px";
+        foodImage.style.width = segmentSize + "px";
+        foodImage.style.height = segmentSize + "px";
+        gameBoard.appendChild(foodImage);
+      })
     }
 
     function update() {
 
       if (new Set(snakeGifs.slice(1)).size == 7 && !sevenZisDisplayed) {
         // Display a random message for 2 seconds
-          sevenZisDisplayed = true;
-          var sevenZis = document.createElement("div");
-          sevenZis.innerHTML = "You have traveled the seven Zis </br> collected 7 different gifs";
-          sevenZis.style.position = "absolute";
-          sevenZis.style.top = "50%";
-          sevenZis.style.left = "50%";
-          sevenZis.style.transform = "translate(-50%, -50%)";
-          sevenZis.style.color = "white";
-          sevenZis.style.fontSize = "48px";
-          document.body.appendChild(sevenZis);
+        sevenZisDisplayed = true;
+        var sevenZis = document.createElement("div");
+        sevenZis.innerHTML = "You have traveled the seven Zis </br> collected 7 different gifs";
+        sevenZis.style.position = "absolute";
+        sevenZis.style.top = "50%";
+        sevenZis.style.left = "50%";
+        sevenZis.style.transform = "translate(-50%, -50%)";
+        sevenZis.style.color = "white";
+        sevenZis.style.fontSize = "48px";
+        document.body.appendChild(sevenZis);
 
-          setTimeout(function () {
-            document.body.removeChild(sevenZis);
-          }, 5000);
+        setTimeout(function () {
+          document.body.removeChild(sevenZis);
+        }, 5000);
       }
 
       lastDirection = direction; // Update the last direction
@@ -178,29 +180,39 @@
         head.x >= gameBoardWidth ||
         head.y < 0 ||
         head.y >= gameBoardHeight
-      ) {
+        ) {
+        gameOver();
+      return;
+    }
+
+      // Check for collision with the snake's body
+    for (var j = 1; j < snake.length; j++) {
+      if (head.x === snake[j].x && head.y === snake[j].y) {
         gameOver();
         return;
       }
-
-      // Check for collision with the snake's body
-      for (var j = 1; j < snake.length; j++) {
-        if (head.x === snake[j].x && head.y === snake[j].y) {
-          gameOver();
-          return;
-        }
-      }
+    }
 
       // Check if the snake eats the food
-      var foodEaten = head.x === food.x && head.y === food.y;
+    var foodEaten = -1;
+    for (var i = 0; i < food.length; i++) {
+      if (head.x === food[i].x && head.y === food[i].y) {
+        foodEaten = i;
+        break;
+      }
+    }
 
       // Update the snake's body
-      snake.unshift({ x: head.x, y: head.y });
-      if (!foodEaten) {
-        snake.pop();
-      } else {
-        snakeGifs.push(food.src);
-        food = getRandomFood();
+    snake.unshift({ x: head.x, y: head.y });
+    if (foodEaten == -1) {
+      snake.pop();
+    } else {
+      snakeGifs.push(food[foodEaten].src);
+      food.splice(foodEaten, 1);
+        if (Math.random() < 0.1) { // 10% chance
+          food.push(getRandomFood());
+        }
+        food.push(getRandomFood());
         score += 1;
         scoreElement.textContent = "Score: " + score;
         if (score == 10) {
@@ -257,7 +269,7 @@
       snake = [{ x: 0, y: 0 }];
       snakeGifs = ["taxzi_excited.gif"];
       direction = "right";
-      food = getRandomFood();
+      food = [getRandomFood()];
       score = 0;
       scoreElement.textContent = "Score: " + score;
       draw();
@@ -270,21 +282,21 @@
       topPlayersElement.innerHTML = "Top Players:<br>";
 
       fetch('https://sheetdb.io/api/v1/5kgtfv38c6ss1?sort_by=score&sort_order=desc&limit=10&cast_numbers=score')
-        .then((response) => response.json())
-        .then((data) => {
-          data.forEach(function (player, index) {
-            var playerElement = document.createElement("div");
-            playerElement.textContent = (index + 1) + ". " + player.name + " : " + player.score;
-            topPlayersElement.appendChild(playerElement);
-          });
+      .then((response) => response.json())
+      .then((data) => {
+        data.forEach(function (player, index) {
           var playerElement = document.createElement("div");
-            playerElement.textContent = "11. Tormod : -198";
-            topPlayersElement.appendChild(playerElement);
+          playerElement.textContent = (index + 1) + ". " + player.name + " : " + player.score;
+          topPlayersElement.appendChild(playerElement);
         });
+        var playerElement = document.createElement("div");
+        playerElement.textContent = "11. Tormod : -198";
+        topPlayersElement.appendChild(playerElement);
+      });
     }
 
 // Event listeners for keyboard controls
-document.addEventListener("keydown", function (event) {
+    document.addEventListener("keydown", function (event) {
   if (event.key === "ArrowRight" && lastDirection !== "left") { // Check the last direction instead of the current direction
     started = true;
     var topPlayersElement = document.getElementById("top-players");
@@ -325,14 +337,14 @@ document.addEventListener("keydown", function (event) {
         },
         body: JSON.stringify({
           data: [
-            {
-              'name': name,
-              'score': score
-            }
+          {
+            'name': name,
+            'score': score
+          }
           ]
         })
       }).then((response) => displayTopPlayers())
-        .then((data) => console.log(data));
+      .then((data) => console.log(data));
     }
 
     draw();
